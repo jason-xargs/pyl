@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS ACCOUNT_BOOT
+(
+  ID            INT PRIMARY KEY NOT NULL,
+  TRADE_TYPE    TEXT            NOT NULL,
+  DATE          TEXT            NOT NULL,
+  CATEGORY      TEXT,
+  SUB_CATEGORY  TEXT,
+  FIRST_ACCOUNT TEXT            NOT NULL,
+  LAST_ACCOUNT  TEXT,
+  PROJECT       TEXT,
+  MEMBER        TEXT            NOT NULL,
+  MERCHANT      TEXT,
+  MONEY         REAL            NOT NULL,
+  REMARK        TEXT
+)

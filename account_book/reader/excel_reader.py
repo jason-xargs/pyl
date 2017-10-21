@@ -6,8 +6,8 @@ def read(location):
     workbook = xlrd.open_workbook(location)
     sheet_outcome = workbook.sheets()[0]
     sheet_income = workbook.sheets()[1]
-    sheet_transfer = workbook.sheets()[2]
-    sheet_init = workbook.sheets()[3]
+    sheet_init = workbook.sheets()[2]
+    sheet_transfer = workbook.sheets()[3]
 
     result = []
     result.extend(analytic(sheet_outcome, TradeType.OUTCOME))

@@ -1,4 +1,4 @@
 .idea/
-*ACCOUNT_BOOK
 *.DS_Store
 *.pyc
+account_book/main/ACCOUNT_BOOK

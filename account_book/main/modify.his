@@ -1,0 +1,88 @@
+## 格式化
+.headers on
+.mode column
+
+## 数据清洗
+delete from ACCOUNT_BOOK where trade_type = 3 or trade_type = 4;  # 清除转账及初始化数据
+delete from ACCOUNT_BOOK where id in (322,284,387,181);           # 清除大金额记录(装修+汽车+公积金提取)
+---- 50000  322
+---- 20000  284
+---- 48443  181
+++++ 76500  387
+
+## 每月结余
+select month1,income,outcome from (
+   select strftime('%Y-%m',date(DATE)) as month1,sum(money) as income from ACCOUNT_BOOK where trade_type = 1 group by strftime('%Y-%m',date(DATE))
+) t1
+join (
+   select strftime('%Y-%m',date(DATE)) as month2,sum(money) as outcome from ACCOUNT_BOOK where trade_type = 2 group by strftime('%Y-%m',date(DATE))
+) t2
+where t1.month1 = t2.month2;
+
+month1      income      outcome
+----------  ----------  ----------
+2017-01     21980.87    37188.91
+2017-02     21985.26    12056.69
+2017-03     21985.26    10244.65
+2017-04     59872.5     18053.27    # 奖金 34881.0
+2017-05     23472.03    21280.42
+2017-06     23844.45    9943.2
+2017-07     15504.49    24418.71
+2017-08     22387.22    26892.85
+2017-09     17732.9     12236.0
+2017-10     26006.65    18906.5     # 奖金 约5000
+2017-11     19813.4     15827.88
+
+delete from ACCOUNT_BOOK where strftime('%Y-%m',date(DATE)) = '2017-02';
+delete from ACCOUNT_BOOK where strftime('%Y-%m',date(DATE)) = '2017-01';
+
+month1      income      outcome
+----------  ----------  ----------
+2017-03     21985.26    10244.65
+2017-04     59872.5     18053.27
+2017-05     23472.03    21280.42
+2017-06     23844.45    9943.2
+2017-07     15504.49    24418.71
+2017-08     22387.22    26892.85
+2017-09     17732.9     12236.0
+2017-10     26006.65    18906.5
+
+## 成员结余
+select sum(money) as '金额',case trade_type when 1 then '收入' when 2 then '支出' end as '类型',member as '成员' from account_book group by trade_type,member;
+
+金额      类型      成员
+----------  ----------  ----------
+49805.2     收入      Grace
+224779.83   收入      Jason
+41387.23    支出      Grace
+60890.52    支出      Jason
+104771.33   支出      家庭公用
+
+## 成员top10支出
+select * from account_book where member = '家庭公用' order by money desc limit 0,10;
+ID          TRADE_TYPE  DATE                 CATEGORY      SUB_CATEGORY  FIRST_ACCOUNT   LAST_ACCOUNT  PROJECT     MEMBER        MERCHANT    MONEY       REMARK
+----------  ----------  -------------------  ------------  ------------  --------------  ------------  ----------  ------------  ----------  ----------  ----------
+80          2           2017-08-19 13:00:24  居家物业  房租        WageCard.Jason                            家庭公用              19000.0     房屋
+395         2           2017-01-13 11:30:25  居家物业  房租        Standby                                   家庭公用              16800.0     房屋
+59          2           2017-09-30 17:30:30  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              5000.0      日常
+314         2           2017-03-31 10:30:03  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              4091.55
+29          2           2017-10-31 10:10:51  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              4000.0      日常
+19          2           2017-11-09 17:00:09  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              3000.0      日常
+215         2           2017-05-31 13:30:24  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              3000.0      日常零�
+239         2           2017-05-15 15:30:45  食品酒水  早午晚餐  WageCard.Grace                            家庭公用              2500.0      日常
+105         2           2017-07-31 12:30:56  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              2457.76     日常 未
+184         2           2017-06-16 23:59:05  食品酒水  早午晚餐  WageCard.Jason                            家庭公用              2450.97
+
+select * from account_book where member = 'Grace' and trade_type = 2 order by money desc limit 0,10;
+ID          TRADE_TYPE  DATE                 CATEGORY      SUB_CATEGORY  FIRST_ACCOUNT   LAST_ACCOUNT  PROJECT     MEMBER      MERCHANT    MONEY       REMARK
+----------  ----------  -------------------  ------------  ------------  --------------  ------------  ----------  ----------  ----------  ----------  ----------
+382         2           2017-01-24 21:30:44  衣服饰品  衣服裤子  WageCard.Grace                            Grace                   3215.72     Unknown
+53          2           2017-10-07 17:30:13  食品酒水  早午晚餐  WageCard.Grace                            Grace                   3000.0      Home
+106         2           2017-07-31 12:30:52  衣服饰品  化妆饰品  WageCard.Grace                            Grace                   3000.0      化妆品
+206         2           2017-06-01 16:30:46  人情往来  孝敬家长  WageCard.Grace                            Grace                   3000.0      Mother&Gra
+394         2           2017-01-15 11:30:26  衣服饰品  衣服裤子  Cash                                      Grace                   2500.0      羽绒服
+107         2           2017-07-31 12:30:29  食品酒水  早午晚餐  WageCard.Grace                            Grace                   2464.39     日常 未
+145         2           2017-07-05 13:30:19  学习进修  数码装备  BlueCad.ICBC                              Grace                   2198.88     iPhone se
+281         2           2017-04-20 14:00:04  休闲娱乐  旅游度假  WageCard.Grace                            Grace                   2000.0      青岛 旅
+264         2           2017-05-01 13:30     衣服饰品  化妆饰品  BlueCad.ICBC                              Grace                   1911.3      聚美
+117         2           2017-07-23 13:59:12  居家物业  日常用品  BlueCad.ICBC                              Grace                   1799.0      冰箱

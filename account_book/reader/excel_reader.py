@@ -24,15 +24,15 @@ def analytic(workbook, trade_type):
         bill = Bill()
         if row:
             bill.trade_type = trade_type
-            bill.date = row[1]
-            bill.category = row[2]
-            bill.sub_category = row[3]
-            bill.first_account = row[4]
-            bill.last_account = row[5]
-            bill.project = row[6]
-            bill.member = row[7]
-            bill.merchant = row[8]
-            bill.money = row[9]
+            bill.date = row[9]
+            bill.category = row[1]
+            bill.sub_category = row[2]
+            bill.first_account = row[3]
+            bill.last_account = row[4]
+            bill.project = row[8]
+            bill.member = row[6]
+            bill.merchant = row[7]
+            bill.money = row[5]
             bill.remark = row[10]
             bills.append(bill)
     return bills

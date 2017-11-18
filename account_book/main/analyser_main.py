@@ -37,9 +37,9 @@ def analyse(summary):
     surplus = now - init
     print init, now, surplus
 
-    json_surplus = summary.income_json - summary.outcome_json - summary.outcome_share * 0.6
+    json_surplus = summary.income_json - summary.outcome_json - summary.outcome_share * 0.7
     print json_surplus
-    grace_surplus = summary.income_grace - summary.outcome_grace - summary.outcome_share * 0.4
+    grace_surplus = summary.income_grace - summary.outcome_grace - summary.outcome_share * 0.3
     print grace_surplus
 
 
